@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق صلاة القضاء - قضاء ما فات من الصلوات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary-color: #1a5f23;
+            --secondary-color: #d4af37;
+            --light-color: #f8f9fa;
+            --dark-color: #2c3e50;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 15px;
+            --transition: all 0.3s ease;
+        }
+        body {
+            font-family: 'Amiri', serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            background-image: linear-gradient(to bottom, rgba(245, 245, 245, 0.9), rgba(245, 245, 245, 0.9)), url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtMy4zMTMgMC02IDIuNjg3LTYgNnMyLjY4NyA2IDYgNiA2LTIuNjg3IDYtNi0yLjY4Ny02LTYtNnoiIGZpbGw9IiMxYTVmMjMiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvZz48L3N2Zz4=');
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header {
+            text-align: center; padding: 30px 20px; background-color: var(--primary-color);
+            color: white; border-radius: var(--border-radius); margin-bottom: 30px;
+            box-shadow: var(--shadow); position: relative; overflow: hidden;
+        }
+        header::before {
+            content: "\f00c"; font-family: "Font Awesome 6 Free"; font-weight: 900;
+            position: absolute; font-size: 150px; opacity: 0.1; right: 20px; top: 10px;
+        }
+        header h1 { font-family: 'Scheherazade New', serif; font-size: 2.8rem; margin-bottom: 10px; position: relative; z-index: 1; }
+        header p { font-size: 1.3rem; max-width: 800px; margin: 0 auto; position: relative; z-index: 1; opacity: 0.9; }
+        .calculator-section { background-color: white; border-radius: var(--border-radius); padding: 25px; box-shadow: var(--shadow); margin-bottom: 30px; }
+        .calculator-section h2 { color: var(--primary-color); margin-bottom: 20px; font-size: 2rem; text-align: center; border-bottom: 2px solid var(--secondary-color); padding-bottom: 10px; }
+        .calculator-steps { display: none; }
+        .calculator-step { display: none; }
+        .calculator-step.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .step-header { font-size: 1.5rem; color: var(--dark-color); margin-bottom: 20px; text-align: center; }
+        .step-description { font-size: 1.2rem; color: #666; margin-bottom: 25px; text-align: center; }
+        .options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .option-card { padding: 20px; border: 2px solid #ddd; border-radius: 10px; cursor: pointer; transition: var(--transition); text-align: center; }
+        .option-card:hover { border-color: var(--primary-color); background-color: rgba(26, 95, 35, 0.05); transform: translateY(-3px); }
+        .option-card.selected { border-color: var(--primary-color); background-color: rgba(26, 95, 35, 0.1); }
+        .option-icon { font-size: 2.5rem; color: var(--secondary-color); margin-bottom: 10px; }
+        .option-title { font-size: 1.3rem; color: var(--dark-color); margin-bottom: 5px; }
+        .option-desc { font-size: 1rem; color: #666; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 1.2rem; margin-bottom: 10px; color: var(--dark-color); font-weight: bold; }
+        .input-control { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 1.2rem; font-family: 'Amiri', serif; transition: var(--transition); }
+        .input-control:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(26, 95, 35, 0.2); }
+        .date-range { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .prayer-selection { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .prayer-option { padding: 15px; border: 2px solid #ddd; border-radius: 10px; cursor: pointer; transition: var(--transition); text-align: center; }
+        .prayer-option:hover { border-color: var(--primary-color); background-color: rgba(26, 95, 35, 0.05); }
+        .prayer-option.selected { border-color: var(--primary-color); background-color: rgba(26, 95, 35, 0.1); }
+        .prayer-option.all-selected { border-color: var(--primary-color); background-color: rgba(26, 95, 35, 0.15); }
+        .prayer-name { font-size: 1.3rem; color: var(--dark-color); }
+        .calculator-buttons { display: flex; justify-content: space-between; margin-top: 30px; }
+        .calc-btn { background-color: var(--secondary-color); color: var(--dark-color); border: none; padding: 15px 30px; border-radius: 10px; font-size: 1.2rem; cursor: pointer; transition: var(--transition); font-family: 'Amiri', serif; display: flex; align-items: center; gap: 10px; }
+        .calc-btn:hover { background-color: #c19b2e; transform: scale(1.05); }
+        .calc-btn.next { background-color: var(--primary-color); color: white; }
+        .calc-btn.next:hover { background-color: #13421b; }
+        .calc-btn:disabled { background-color: #95a5a6; cursor: not-allowed; transform: none; }
+        .results-section { background-color: white; border-radius: var(--border-radius); padding: 25px; box-shadow: var(--shadow); margin-bottom: 30px; display: none; }
+        .results-section h2 { color: var(--primary-color); margin-bottom: 20px; font-size: 2rem; text-align: center; border-bottom: 2px solid var(--secondary-color); padding-bottom: 10px; }
+        .results-summary { background-color: #f8f9fa; border-radius: 10px; padding: 20px; margin-bottom: 25px; text-align: center; }
+        .total-prayers-needed { font-size: 3rem; font-weight: bold; color: var(--primary-color); margin: 10px 0; }
+        .result-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .result-item { background-color: #f8f9fa; border-radius: 10px; padding: 15px; text-align: center; }
+        .result-prayer { font-size: 1.3rem; color: var(--primary-color); margin-bottom: 10px; }
+        .result-count { font-size: 2rem; font-weight: bold; color: var(--dark-color); }
+        .apply-results-btn { background-color: var(--primary-color); color: white; border: none; padding: 15px 30px; border-radius: 10px; font-size: 1.3rem; cursor: pointer; transition: var(--transition); font-family: 'Amiri', serif; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; margin-top: 20px; }
+        .apply-results-btn:hover { background-color: #13421b; transform: scale(1.02); }
+        .target-section { background-color: white; border-radius: var(--border-radius); padding: 25px; box-shadow: var(--shadow); margin-bottom: 30px; display: none; }
+        .target-section h2 { color: var(--primary-color); margin-bottom: 20px; font-size: 2rem; text-align: center; border-bottom: 2px solid var(--secondary-color); padding-bottom: 10px; }
+        .target-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .target-input-group { display: flex; flex-direction: column; }
+        .target-input-group label { font-size: 1.2rem; margin-bottom: 8px; color: var(--dark-color); font-weight: bold; }
+        .target-input { padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 1.3rem; text-align: center; font-family: 'Amiri', serif; transition: var(--transition); }
+        .target-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(26, 95, 35, 0.2); }
+        .target-btn { grid-column: 1 / -1; background-color: var(--secondary-color); color: var(--dark-color); border: none; padding: 15px 30px; border-radius: 10px; font-size: 1.3rem; cursor: pointer; transition: var(--transition); font-family: 'Amiri', serif; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .target-btn:hover { background-color: #c19b2e; transform: scale(1.02); }
+        .stats-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px; display: none; }
+        .stats-card { background-color: white; border-radius: var(--border-radius); padding: 25px; box-shadow: var(--shadow); text-align: center; border-top: 5px solid var(--secondary-color); }
+        .stats-card h2 { color: var(--primary-color); margin-bottom: 15px; font-size: 1.8rem; }
+        .total-prayers { font-size: 3.5rem; font-weight: bold; color: var(--primary-color); margin: 15px 0; }
+        .remaining-prayers { font-size: 3.5rem; font-weight: bold; color: #e74c3c; margin: 15px 0; }
+        .progress-container { background-color: #ecf0f1; border-radius: 10px; height: 20px; margin: 20px 0; overflow: hidden; }
+        .progress-bar { height: 100%; background-color: var(--primary-color); border-radius: 10px; transition: var(--transition); }
+        .prayers-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-bottom: 40px; display: none; }
+        .prayer-card { background-color: white; border-radius: var(--border-radius); padding: 25px; box-shadow: var(--shadow); text-align: center; transition: var(--transition); position: relative; overflow: hidden; }
+        .prayer-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); }
+        .prayer-name { font-size: 2.2rem; color: var(--primary-color); margin-bottom: 15px; font-family: 'Scheherazade New', serif; }
+        .prayer-icon { font-size: 3rem; color: var(--secondary-color); margin-bottom: 20px; }
+        .prayer-count { font-size: 2rem; font-weight: bold; margin: 10px 0; color: var(--dark-color); }
+        .prayer-target { font-size: 1.5rem; color: #7f8c8d; margin-bottom: 15px; }
+        .prayer-progress-container { background-color: #ecf0f1; border-radius: 10px; height: 12px; margin: 15px 0; overflow: hidden; }
+        .prayer-progress-bar { height: 100%; background-color: var(--primary-color); border-radius: 10px; transition: var(--transition); }
+        .prayer-date { font-size: 1.1rem; color: #7f8c8d; margin-top: 15px; min-height: 40px; }
+        .btn { background-color: var(--primary-color); color: white; border: none; padding: 15px 30px; border-radius: 50px; font-size: 1.3rem; cursor: pointer; transition: var(--transition); font-family: 'Amiri', serif; margin-top: 15px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn:hover { background-color: #13421b; transform: scale(1.05); }
+        .btn i { font-size: 1.5rem; }
+        .btn:disabled { background-color: #95a5a6; cursor: not-allowed; transform: none; }
+        .records-section { background-color: white; border-radius: var(--border-radius); padding: 25px; box-shadow: var(--shadow); margin-bottom: 40px; display: none; }
+        .records-section h2 { color: var(--primary-color); margin-bottom: 20px; font-size: 2rem; text-align: center; border-bottom: 2px solid var(--secondary-color); padding-bottom: 10px; }
+        .filter-section { background-color: #f8f9fa; border-radius: 10px; padding: 20px; margin-bottom: 20px; border: 1px solid #e9ecef; }
+        .filter-section h3 { color: var(--primary-color); margin-bottom: 15px; font-size: 1.5rem; text-align: center; }
+        .filter-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .filter-group { display: flex; flex-direction: column; }
+        .filter-group label { font-size: 1.1rem; margin-bottom: 8px; color: var(--dark-color); font-weight: bold; }
+        .filter-select, .filter-date { padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 1.1rem; font-family: 'Amiri', serif; transition: var(--transition); }
+        .filter-select:focus, .filter-date:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(26, 95, 35, 0.2); }
+        .filter-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+        .filter-btn { background-color: var(--secondary-color); color: var(--dark-color); border: none; padding: 12px 20px; border-radius: 10px; font-size: 1.1rem; cursor: pointer; transition: var(--transition); font-family: 'Amiri', serif; display: flex; align-items: center; gap: 8px; }
+        .filter-btn:hover { background-color: #c19b2e; }
+        .filter-btn.clear { background-color: #e74c3c; color: white; }
+        .filter-btn.clear:hover { background-color: #c0392b; }
+        .records-list { max-height: 400px; overflow-y: auto; }
+        .record-item { padding: 15px; border-bottom: 1px solid #ecf0f1; display: flex; justify-content: space-between; align-items: center; }
+        .record-item:last-child { border-bottom: none; }
+        .record-prayer { font-weight: bold; color: var(--primary-color); font-size: 1.3rem; }
+        .record-date { color: #7f8c8d; }
+        .no-records { text-align: center; padding: 30px; color: #7f8c8d; font-size: 1.2rem; }
+        .controls { display: flex; justify-content: center; gap: 20px; margin-bottom: 40px; flex-wrap: wrap; display: none; }
+        .control-btn { background-color: var(--secondary-color); color: var(--dark-color); border: none; padding: 15px 30px; border-radius: 50px; font-size: 1.2rem; cursor: pointer; transition: var(--transition); font-family: 'Amiri', serif; display: flex; align-items: center; gap: 10px; }
+        .control-btn:hover { background-color: #c19b2e; transform: scale(1.05); }
+        footer { text-align: center; padding: 25px; background-color: var(--dark-color); color: white; border-radius: var(--border-radius); margin-top: 30px; box-shadow: var(--shadow); }
+        .motivation { font-size: 1.4rem; font-style: italic; margin-bottom: 15px; color: var(--light-color); }
+        .hadith { font-size: 1.2rem; opacity: 0.9; max-width: 800px; margin: 0 auto; }
+        @media (max-width: 768px) {
+            header h1 { font-size: 2.2rem; }
+            .prayers-section { grid-template-columns: 1fr; }
+            .stats-section { grid-template-columns: 1fr; }
+            .controls { flex-direction: column; }
+            .control-btn, .btn, .target-btn, .filter-btn, .calc-btn, .apply-results-btn { width: 100%; }
+            .target-form, .filter-form { grid-template-columns: 1fr; }
+            .options-grid { grid-template-columns: 1fr; }
+            .date-range { grid-template-columns: 1fr; }
+            .calculator-buttons { flex-direction: column; gap: 10px; }
+            .prayer-selection { grid-template-columns: 1fr; }
+        }
+        .alert { position: fixed; top: 20px; right: 20px; left: 20px; max-width: 500px; margin: 0 auto; padding: 20px; background-color: white; border-radius: var(--border-radius); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); z-index: 1000; text-align: center; transform: translateY(-100px); opacity: 0; transition: all 0.5s ease; }
+        .alert.show { transform: translateY(0); opacity: 1; }
+        .alert.success { border-top: 5px solid #2ecc71; }
+        .alert.info { border-top: 5px solid #3498db; }
+        .alert.warning { border-top: 5px solid #f39c12; }
+        .alert h3 { color: var(--primary-color); margin-bottom: 10px; }
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #13421b; }
+        .steps-progress { display: flex; justify-content: space-between; margin-bottom: 30px; position: relative; }
+        .steps-progress::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 4px; background-color: #ddd; transform: translateY(-50%); z-index: 1; }
+        .step-progress-bar { position: absolute; top: 50%; left: 0; height: 4px; background-color: var(--primary-color); transform: translateY(-50%); z-index: 2; transition: var(--transition); }
+        .step-point { width: 40px; height: 40px; border-radius: 50%; background-color: white; border: 4px solid #ddd; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #666; position: relative; z-index: 3; transition: var(--transition); }
+        .step-point.active { border-color: var(--primary-color); color: var(--primary-color); background-color: white; }
+        .step-point.completed { border-color: var(--primary-color); background-color: var(--primary-color); color: white; }
+        .step-label { position: absolute; top: 45px; width: 100px; text-align: center; font-size: 0.9rem; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-mosque"></i> تطبيق صلاة القضاء</h1>
+            <p>سجل صلوات القضاء التي تؤديها واتبع عدد الصلوات المتبقية لك</p>
+        </header>
+
+        <section class="calculator-section" id="calculatorSection">
+            <h2><i class="fas fa-calculator"></i> حساب الصلوات المطلوبة قضاؤها</h2>
+            
+            <div class="steps-progress">
+                <div class="step-progress-bar" id="stepProgressBar" style="width: 25%;"></div>
+                
+                <div class="step-point active" id="step1Point">
+                    1
+                    <div class="step-label">اختيار الطريقة</div>
+                </div>
+                
+                <div class="step-point" id="step2Point">
+                    2
+                    <div class="step-label">تحديد التفاصيل</div>
+                </div>
+                
+                <div class="step-point" id="step3Point">
+                    3
+                    <div class="step-label">اختيار الصلوات</div>
+                </div>
+                
+                <div class="step-point" id="step4Point">
+                    4
+                    <div class="step-label">النتائج</div>
+                </div>
+            </div>
+            
+            <div class="calculator-step active" id="step1">
+                <h3 class="step-header">كيف تريد حساب الصلوات المطلوبة؟</h3>
+                <p class="step-description">اختر الطريقة المناسبة لحساب عدد الصلوات التي تحتاج إلى قضائها</p>
+                
+                <div class="options-grid">
+                    <div class="option-card" onclick="selectMethod('days')">
+                        <div class="option-icon">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="option-title">حساب بالأيام</div>
+                        <div class="option-desc">أدخل عدد الأيام التي فاتتك فيها الصلاة</div>
+                    </div>
+                    
+                    <div class="option-card" onclick="selectMethod('months')">
+                        <div class="option-icon">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <div class="option-title">حساب بالأشهر</div>
+                        <div class="option-desc">أدخل عدد الأشهر التي فاتتك فيها الصلاة</div>
+                    </div>
+                    
+                    <div class="option-card" onclick="selectMethod('years')">
+                        <div class="option-icon">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                        <div class="option-title">حساب بالسنوات</div>
+                        <div class="option-desc">أدخل عدد السنوات التي فاتتك فيها الصلاة</div>
+                    </div>
+                    
+                    <div class="option-card" onclick="selectMethod('range')">
+                        <div class="option-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="option-title">حساب بالمدة</div>
+                        <div class="option-desc">حدد تاريخ البدء والانتهاء للفترة التي فاتتك فيها الصلاة</div>
+                    </div>
+                </div>
+                
+                <div class="calculator-buttons">
+                    <button class="calc-btn" disabled>
+                        <i class="fas fa-arrow-right"></i> السابق
+                    </button>
+                    <button class="calc-btn next" onclick="nextStep()" id="step1NextBtn" disabled>
+                        التالي <i class="fas fa-arrow-left"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="calculator-step" id="step2">
+                <h3 class="step-header" id="step2Header">أدخل التفاصيل</h3>
+                <p class="step-description" id="step2Description">أدخل التفاصيل المطلوبة لحساب عدد الصلوات</p>
+                
+                <div id="step2Content">
+                    </div>
+                
+                <div class="calculator-buttons">
+                    <button class="calc-btn" onclick="prevStep()">
+                        <i class="fas fa-arrow-right"></i> السابق
+                    </button>
+                    <button class="calc-btn next" onclick="nextStep()" id="step2NextBtn" disabled>
+                        التالي <i class="fas fa-arrow-left"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="calculator-step" id="step3">
+                <h3 class="step-header">اختر الصلوات المطلوبة</h3>
+                <p class="step-description">اختر الصلوات التي تريد حساب عددها للقضاء</p>
+                
+                <div class="prayer-selection" id="prayerSelection">
+                    </div>
+                
+                <div class="calculator-buttons">
+                    <button class="calc-btn" onclick="prevStep()">
+                        <i class="fas fa-arrow-right"></i> السابق
+                    </button>
+                    <button class="calc-btn next" onclick="nextStep()" id="step3NextBtn">
+                        التالي <i class="fas fa-arrow-left"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="calculator-step" id="step4">
+                <h3 class="step-header">نتائج الحساب</h3>
+                <p class="step-description">إليك عدد الصلوات المطلوبة قضاؤها حسب المعلومات التي أدخلتها</p>
+                
+                <div id="step4Content">
+                    </div>
+                
+                <div class="calculator-buttons">
+                    <button class="calc-btn" onclick="prevStep()">
+                        <i class="fas fa-arrow-right"></i> السابق
+                    </button>
+                    <button class="calc-btn next" onclick="applyCalculationResults()">
+                        تطبيق النتائج <i class="fas fa-check"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="results-section" id="resultsSection">
+            </section>
+
+        <section class="target-section" id="targetSection">
+            </section>
+
+        <section class="stats-section" id="statsSection">
+            </section>
+
+        <section class="prayers-section" id="prayersSection">
+            </section>
+
+        <div class="controls" id="controlsSection">
+            </div>
+
+        <section class="records-section" id="recordsSection">
+            </section>
+
+        <footer>
+            <p class="motivation">"ما من عبد يصلي لله اثنتي عشرة ركعة تطوعًا في يوم وليلة إلا بنى الله له بيتًا في الجنة"</p>
+            <p class="hadith">- حديث شريف -</p>
+            <p style="margin-top: 15px;">تطبيق صلاة القضاء &copy; 2023 | اجعل قضاء الصلوات الفائتة عادة شهرية</p>
+        </footer>
+    </div>
+
+    <div class="alert" id="alertMessage">
+        <h3 id="alertTitle">عنوان التنبيه</h3>
+        <p id="alertText">نص التنبيه</p>
+    </div>
+
+    <script>
+        // بيانات التطبيق
+        const prayers = [
+            { id: 'fajr', name: 'صلاة الفجر', icon: 'fas fa-sun', color: '#3498db', count: 0, target: 0, records: [] },
+            { id: 'dhuhr', name: 'صلاة الظهر', icon: 'fas fa-sun', color: '#f39c12', count: 0, target: 0, records: [] },
+            { id: 'asr', name: 'صلاة العصر', icon: 'fas fa-sun', color: '#e67e22', count: 0, target: 0, records: [] },
+            { id: 'maghrib', name: 'صلاة المغرب', icon: 'fas fa-moon', color: '#9b59b6', count: 0, target: 0, records: [] },
+            { id: 'isha', name: 'صلاة العشاء', icon: 'fas fa-moon', color: '#34495e', count: 0, target: 0, records: [] }
+        ];
+
+        // متغيرات الحساب
+        let currentStep = 1;
+        let calculationMethod = null;
+        let calculationDetails = {};
+        let selectedPrayers = [];
+        let calculationResults = {};
+
+        // تهيئة التطبيق
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPrayersData();
+            showCalculator();
+            setupCalculator();
+        });
+
+        // إعداد معالج الحساب
+        function setupCalculator() {
+            setupPrayerSelection();
+        }
+
+        // تحميل البيانات من localStorage
+        function loadPrayersData() {
+            const savedData = localStorage.getItem('qadaaPrayersData');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                prayers.forEach(prayer => {
+                    const savedPrayer = parsedData.find(p => p.id === prayer.id);
+                    if (savedPrayer) {
+                        prayer.count = savedPrayer.count;
+                        prayer.target = savedPrayer.target || 0;
+                        prayer.records = savedPrayer.records;
+                    }
+                });
+            }
+        }
+
+        // حفظ البيانات في localStorage
+        function savePrayersData() {
+            localStorage.setItem('qadaaPrayersData', JSON.stringify(prayers));
+        }
+
+        // عرض معالج الحساب وإخفاء الأقسام الأخرى
+        function showCalculator() {
+            document.getElementById('calculatorSection').style.display = 'block';
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('targetSection').style.display = 'none';
+            document.getElementById('statsSection').style.display = 'none';
+            document.getElementById('prayersSection').style.display = 'none';
+            document.getElementById('controlsSection').style.display = 'none';
+            document.getElementById('recordsSection').style.display = 'none';
+        }
+
+        // عرض الأقسام الرئيسية بعد انتهاء الحساب
+        function showMainSections() {
+            document.getElementById('calculatorSection').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'block';
+            document.getElementById('targetSection').style.display = 'block';
+            document.getElementById('statsSection').style.display = 'block';
+            document.getElementById('prayersSection').style.display = 'block';
+            document.getElementById('controlsSection').style.display = 'flex';
+            document.getElementById('recordsSection').style.display = 'block';
+            updateAllSections();
+        }
+
+        // تحديث جميع الأقسام
+        function updateAllSections() {
+            renderTargetSection();
+            renderPrayerCards();
+            updateStats();
+            renderRecords();
+            setupRecordsFilter();
+            setupControls();
+        }
+
+        // اختيار طريقة الحساب
+        function selectMethod(method) {
+            calculationMethod = method;
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            const selectedCard = document.querySelector(`.option-card[onclick*="${method}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+            }
+            document.getElementById('step1NextBtn').disabled = false;
+        }
+
+        // التقدم للخطوة التالية
+        function nextStep() {
+            if (currentStep < 4) {
+                if (currentStep === 1) {
+                    if (!calculationMethod) {
+                        showAlert('اختر طريقة', 'يرجى اختيار طريقة حساب الصلوات المطلوبة', 'warning');
+                        return;
+                    }
+                    setupStep2();
+                }
+                
+                if (currentStep === 2) {
+                    if (!validateStep2()) {
+                        return;
+                    }
+                    saveStep2Details();
+                    setupStep3(); // هذا السطر كان يسبب المشكلة لأنه لم يجد الدالة
+                }
+                
+                if (currentStep === 3) {
+                    if (selectedPrayers.length === 0) {
+                        showAlert('اختر صلوات', 'يرجى اختيار صلاة واحدة على الأقل', 'warning');
+                        return;
+                    }
+                    calculateResults();
+                    setupStep4();
+                }
+                
+                updateProgressBar(currentStep + 1);
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                currentStep++;
+                document.getElementById(`step${currentStep}`).classList.add('active');
+            }
+        }
+
+        // العودة للخطوة السابقة
+        function prevStep() {
+            if (currentStep > 1) {
+                updateProgressBar(currentStep - 1);
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                currentStep--;
+                document.getElementById(`step${currentStep}`).classList.add('active');
+            }
+        }
+
+        // تحديث شريط التقدم
+        function updateProgressBar(step) {
+            const progressPercent = (step - 1) * 33.33;
+            document.getElementById('stepProgressBar').style.width = `${progressPercent}%`;
+            
+            for (let i = 1; i <= 4; i++) {
+                const point = document.getElementById(`step${i}Point`);
+                if (i < step) {
+                    point.className = 'step-point completed';
+                } else if (i === step) {
+                    point.className = 'step-point active';
+                } else {
+                    point.className = 'step-point';
+                }
+            }
+        }
+
+        // إعداد الخطوة 2 بناءً على الطريقة المختارة
+        function setupStep2() {
+            const step2Header = document.getElementById('step2Header');
+            const step2Description = document.getElementById('step2Description');
+            const step2Content = document.getElementById('step2Content');
+            const nextBtn = document.getElementById('step2NextBtn');
+            
+            // إعادة تعيين الزر ليكون معطلاً في البداية
+            nextBtn.disabled = true;
+            
+            let contentHTML = '';
+            switch(calculationMethod) {
+                case 'days':
+                    step2Header.textContent = 'حساب بالأيام';
+                    step2Description.textContent = 'أدخل عدد الأيام التي فاتتك فيها الصلاة';
+                    contentHTML = `
+                        <div class="input-group">
+                            <label for="daysCount"><i class="fas fa-calendar-day"></i> عدد الأيام</label>
+                            <input type="number" id="daysCount" class="input-control" min="1" placeholder="أدخل عدد الأيام">
+                            <p style="margin-top: 10px; color: #666; font-size: 1rem;">كل يوم يحتوي على 5 صلوات (فجر، ظهر، عصر، مغرب، عشاء)</p>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'months':
+                    step2Header.textContent = 'حساب بالأشهر';
+                    step2Description.textContent = 'أدخل عدد الأشهر التي فاتتك فيها الصلاة';
+                    contentHTML = `
+                        <div class="input-group">
+                            <label for="monthsCount"><i class="fas fa-calendar-week"></i> عدد الأشهر</label>
+                            <input type="number" id="monthsCount" class="input-control" min="1" placeholder="أدخل عدد الأشهر">
+                            <p style="margin-top: 10px; color: #666; font-size: 1rem;">كل شهر يحتوي تقريباً على 30 يوم × 5 صلوات = 150 صلاة</p>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'years':
+                    step2Header.textContent = 'حساب بالسنوات';
+                    step2Description.textContent = 'أدخل عدد السنوات التي فاتتك فيها الصلاة';
+                    contentHTML = `
+                        <div class="input-group">
+                            <label for="yearsCount"><i class="fas fa-calendar"></i> عدد السنوات</label>
+                            <input type="number" id="yearsCount" class="input-control" min="1" placeholder="أدخل عدد السنوات">
+                            <p style="margin-top: 10px; color: #666; font-size: 1rem;">كل سنة تحتوي تقريباً على 365 يوم × 5 صلوات = 1825 صلاة</p>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'range':
+                    step2Header.textContent = 'حساب بالمدة';
+                    step2Description.textContent = 'حدد تاريخ البدء والانتهاء للفترة التي فاتتك فيها الصلاة';
+                    const today = new Date();
+                    const todayFormatted = today.toISOString().split('T')[0];
+                    const lastMonth = new Date();
+                    lastMonth.setMonth(today.getMonth() - 1);
+                    const lastMonthFormatted = lastMonth.toISOString().split('T')[0];
+                    
+                    contentHTML = `
+                        <div class="input-group">
+                            <label><i class="fas fa-calendar-alt"></i> الفترة الزمنية</label>
+                            <div class="date-range">
+                                <div>
+                                    <label for="startDate" style="font-size: 1rem;">تاريخ البدء</label>
+                                    <input type="date" id="startDate" class="input-control" value="${lastMonthFormatted}">
+                                </div>
+                                <div>
+                                    <label for="endDate" style="font-size: 1rem;">تاريخ الانتهاء</label>
+                                    <input type="date" id="endDate" class="input-control" value="${todayFormatted}">
+                                </div>
+                            </div>
+                            <p style="margin-top: 10px; color: #666; font-size: 1rem;">سيتم حساب عدد الأيام بين التاريخين ثم عدد الصلوات</p>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            // حقن الـ HTML
+            step2Content.innerHTML = contentHTML;
+
+            // إضافة مستمعي الأحداث بشكل صريح وقوي
+            if (calculationMethod === 'days') {
+                const input = document.getElementById('daysCount');
+                input.addEventListener('input', function() {
+                    nextBtn.disabled = !(this.value && parseInt(this.value) > 0);
+                });
+                input.addEventListener('keyup', function() {
+                    nextBtn.disabled = !(this.value && parseInt(this.value) > 0);
+                });
+            } 
+            else if (calculationMethod === 'months') {
+                const input = document.getElementById('monthsCount');
+                input.addEventListener('input', function() {
+                    nextBtn.disabled = !(this.value && parseInt(this.value) > 0);
+                });
+                input.addEventListener('keyup', function() {
+                    nextBtn.disabled = !(this.value && parseInt(this.value) > 0);
+                });
+            }
+            else if (calculationMethod === 'years') {
+                const input = document.getElementById('yearsCount');
+                input.addEventListener('input', function() {
+                    nextBtn.disabled = !(this.value && parseInt(this.value) > 0);
+                });
+                input.addEventListener('keyup', function() {
+                    nextBtn.disabled = !(this.value && parseInt(this.value) > 0);
+                });
+            }
+            else if (calculationMethod === 'range') {
+                const startDateField = document.getElementById('startDate');
+                const endDateField = document.getElementById('endDate');
+                
+                const validateRange = () => {
+                    if (startDateField.value && endDateField.value) {
+                        nextBtn.disabled = false;
+                    } else {
+                        nextBtn.disabled = true;
+                    }
+                };
+                
+                startDateField.addEventListener('input', validateRange);
+                startDateField.addEventListener('change', validateRange);
+                endDateField.addEventListener('input', validateRange);
+                endDateField.addEventListener('change', validateRange);
+                
+                // تفعيل مبدئي في حال وجود قيم افتراضية
+                validateRange();
+            }
+        }
+
+        // التحقق من صحة بيانات الخطوة 2
+        function validateStep2() {
+            let isValid = true;
+            let errorMessage = '';
+            
+            switch(calculationMethod) {
+                case 'days':
+                    const daysElement = document.getElementById('daysCount');
+                    const daysCount = daysElement ? parseInt(daysElement.value) : 0;
+                    if (!daysCount || daysCount < 1 || isNaN(daysCount)) {
+                        isValid = false;
+                        errorMessage = 'يرجى إدخال عدد أيام صحيح';
+                    } else if (daysCount > 3650) {
+                        isValid = false;
+                        errorMessage = 'عدد الأيام كبير جداً، يرجى التأكد من الرقم';
+                    }
+                    break;
+                case 'months':
+                    const monthsElement = document.getElementById('monthsCount');
+                    const monthsCount = monthsElement ? parseInt(monthsElement.value) : 0;
+                    if (!monthsCount || monthsCount < 1 || isNaN(monthsCount)) {
+                        isValid = false;
+                        errorMessage = 'يرجى إدخال عدد أشهر صحيح';
+                    } else if (monthsCount > 120) {
+                        isValid = false;
+                        errorMessage = 'عدد الأشهر كبير جداً، يرجى التأكد من الرقم';
+                    }
+                    break;
+                case 'years':
+                    const yearsElement = document.getElementById('yearsCount');
+                    const yearsCount = yearsElement ? parseInt(yearsElement.value) : 0;
+                    if (!yearsCount || yearsCount < 1 || isNaN(yearsCount)) {
+                        isValid = false;
+                        errorMessage = 'يرجى إدخال عدد سنوات صحيح';
+                    } else if (yearsCount > 10) {
+                        isValid = false;
+                        errorMessage = 'عدد السنوات كبير جداً، يرجى التأكد من الرقم';
+                    }
+                    break;
+                case 'range':
+                    const startDate = document.getElementById('startDate').value;
+                    const endDate = document.getElementById('endDate').value;
+                    
+                    if (!startDate || !endDate) {
+                        isValid = false;
+                        errorMessage = 'يرجى إدخال تاريخ البدء والانتهاء';
+                    } else {
+                        const start = new Date(startDate);
+                        const end = new Date(endDate);
+                        
+                        if (start > end) {
+                            isValid = false;
+                            errorMessage = 'تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء';
+                        } else {
+                            const diffTime = Math.abs(end - start);
+                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                            if (diffDays > 3650) {
+                                isValid = false;
+                                errorMessage = 'الفترة الزمنية طويلة جداً، يرجى التأكد من التواريخ';
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    isValid = false;
+                    errorMessage = 'طريقة الحساب غير محددة';
+            }
+            
+            if (!isValid) {
+                showAlert('خطأ في الإدخال', errorMessage, 'warning');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // حفظ تفاصيل الخطوة 2
+        function saveStep2Details() {
+            calculationDetails.method = calculationMethod;
+            switch(calculationMethod) {
+                case 'days': {
+                    calculationDetails.days = parseInt(document.getElementById('daysCount').value);
+                    calculationDetails.inputValue = calculationDetails.days;
+                    break;
+                }
+                case 'months': {
+                    calculationDetails.months = parseInt(document.getElementById('monthsCount').value);
+                    calculationDetails.days = calculationDetails.months * 30; // تقديرياً
+                    calculationDetails.inputValue = calculationDetails.months;
+                    break;
+                }
+                case 'years': {
+                    calculationDetails.years = parseInt(document.getElementById('yearsCount').value);
+                    calculationDetails.days = calculationDetails.years * 365; // تقديرياً
+                    calculationDetails.inputValue = calculationDetails.years;
+                    break;
+                }
+                case 'range': {
+                    const startDate = document.getElementById('startDate').value;
+                    const endDate = document.getElementById('endDate').value;
+                    const start = new Date(startDate);
+                    const end = new Date(endDate);
+                    const diffTime = Math.abs(end - start);
+                    calculationDetails.days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    calculationDetails.startDate = startDate;
+                    calculationDetails.endDate = endDate;
+                    calculationDetails.inputValue = calculationDetails.days;
+                    break;
+                }
+            }
+        }
+        
+        // إعداد الخطوة 3 (هذه الدالة كانت مفقودة)
+        function setupStep3() {
+            // إعادة تهيئة خيارات الصلاة
+            setupPrayerSelection();
+            
+            // التأكد من حالة الزر في الخطوة 3
+            const nextBtn = document.getElementById('step3NextBtn');
+            nextBtn.disabled = selectedPrayers.length === 0;
+        }
+
+        // إعداد اختيارات الصلوات في الخطوة 3
+        function setupPrayerSelection() {
+            const prayerSelection = document.getElementById('prayerSelection');
+            prayerSelection.innerHTML = '';
+            
+            const allOption = document.createElement('div');
+            allOption.className = 'prayer-option all-selected selected';
+            allOption.onclick = function() { selectAllPrayers(); };
+            allOption.innerHTML = `
+                <div class="prayer-name">كل الصلوات</div>
+                <div style="font-size: 1rem; color: #666;">اختيار جميع الصلوات</div>
+            `;
+            prayerSelection.appendChild(allOption);
+            
+            prayers.forEach(prayer => {
+                const prayerOption = document.createElement('div');
+                prayerOption.className = 'prayer-option selected';
+                prayerOption.onclick = function() { togglePrayerSelection(prayer.id); };
+                prayerOption.innerHTML = `
+                    <div class="prayer-name">${prayer.name}</div>
+                `;
+                prayerSelection.appendChild(prayerOption);
+            });
+            selectAllPrayers(); // تحديد الكل افتراضياً
+        }
+
+        function selectAllPrayers() {
+            selectedPrayers = prayers.map(p => p.id);
+            document.querySelectorAll('.prayer-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelectorAll('.prayer-option').forEach(option => {
+                option.classList.add('selected');
+            });
+            document.getElementById('step3NextBtn').disabled = false;
+        }
+
+        function togglePrayerSelection(prayerId) {
+            const index = selectedPrayers.indexOf(prayerId);
+            if (index === -1) {
+                selectedPrayers.push(prayerId);
+            } else {
+                selectedPrayers.splice(index, 1);
+            }
+            
+            document.querySelectorAll('.prayer-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            selectedPrayers.forEach(pId => {
+                const option = Array.from(document.querySelectorAll('.prayer-option')).find(opt => 
+                    opt.querySelector('.prayer-name') && opt.querySelector('.prayer-name').textContent === 
+                    prayers.find(p => p.id === pId).name
+                );
+                if (option) {
+                    option.classList.add('selected');
+                }
+            });
+            
+            const allOption = document.querySelector('.prayer-option');
+            if (selectedPrayers.length === prayers.length) {
+                allOption.classList.add('selected');
+            }
+            
+            document.getElementById('step3NextBtn').disabled = selectedPrayers.length === 0;
+        }
+
+        // حساب النتائج
+        function calculateResults() {
+            const totalDays = calculationDetails.days || 0;
+            const prayersPerDay = 5;
+            const totalPrayers = totalDays * prayersPerDay;
+            const prayersCount = selectedPrayers.length || 1;
+            const prayersPerType = Math.ceil(totalPrayers / prayersCount); // إذا أردت توزيعها بالتساوي، لكن عادة كل صلاة تقابل مثلها
+            
+            // الصحيح في القضاء: يوم واحد فائت = قضاء يوم واحد (5 صلوات)
+            // إذا اختار المستخدم صلوات محددة فقط، نحسب عدد المرات لتلك الصلوات
+            // مثلا 10 أيام قضاء. يعني 10 صلوات فجر، 10 ظهر.. الخ.
+            
+            calculationResults = {
+                totalDays: totalDays,
+                totalPrayers: totalDays * selectedPrayers.length, // المجموع الكلي للصلوات المختارة
+                prayersPerType: totalDays, // كل صلاة مطلوب قضاؤها بعدد الأيام
+                selectedPrayers: [...selectedPrayers],
+                calculationMethod: calculationMethod,
+                calculationDetails: {...calculationDetails}
+            };
+        }
+
+        // إعداد الخطوة 4 (عرض النتائج)
+        function setupStep4() {
+            const step4Content = document.getElementById('step4Content');
+            let methodText = '';
+            switch(calculationMethod) {
+                case 'days':
+                    methodText = `${calculationDetails.days} يوم`;
+                    break;
+                case 'months':
+                    methodText = `${calculationDetails.months} شهر (تقريباً ${calculationDetails.days} يوم)`;
+                    break;
+                case 'years':
+                    methodText = `${calculationDetails.years} سنة (تقريباً ${calculationDetails.days} يوم)`;
+                    break;
+                case 'range':
+                    methodText = `من ${formatDate(calculationDetails.startDate)} إلى ${formatDate(calculationDetails.endDate)} (${calculationDetails.days} يوم)`;
+                    break;
+            }
+            
+            const selectedPrayersNames = selectedPrayers.map(pId => 
+                prayers.find(p => p.id === pId).name
+            ).join('، ');
+            
+            step4Content.innerHTML = `
+                <div class="results-summary">
+                    <h3>ملخص الحساب</h3>
+                    <p>طريقة الحساب: ${methodText}</p>
+                    <p>الصلوات المختارة: ${selectedPrayersNames}</p>
+                    <div class="total-prayers-needed">${calculationResults.totalPrayers} صلاة</div>
+                    <p>إجمالي عدد الصلوات المطلوبة</p>
+                </div>
+                
+                <div class="result-details">
+                    ${selectedPrayers.map(pId => {
+                        const prayer = prayers.find(p => p.id === pId);
+                        return `
+                            <div class="result-item">
+                                <div class="result-prayer">${prayer.name}</div>
+                                <div class="result-count">${calculationResults.prayersPerType}</div>
+                                <div>صلاة</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                
+                <p style="text-align: center; margin-top: 20px; color: #666; font-size: 1.1rem;">
+                    هذه الأعداد بناءً على المدة التي أدخلتها
+                </p>
+            `;
+        }
+
+        // تطبيق نتائج الحساب على التطبيق
+        function applyCalculationResults() {
+            prayers.forEach(prayer => {
+                if (selectedPrayers.includes(prayer.id)) {
+                    prayer.target = calculationResults.prayersPerType;
+                }
+            });
+            
+            savePrayersData();
+            showMainSections();
+            showAlert('تم الحساب', 'تم حساب وحفظ الصلوات المطلوبة بنجاح', 'success');
+        }
+
+        // عرض قسم إدخال الأهداف
+        function renderTargetSection() {
+            const targetSection = document.getElementById('targetSection');
+            let formHTML = `
+                <h2><i class="fas fa-edit"></i> الصلوات المطلوبة قضاؤها</h2>
+                <form class="target-form" id="targetForm" onsubmit="updateTargets(event)">
+                    ${prayers.map(prayer => `
+                        <div class="target-input-group">
+                            <label for="${prayer.id}Target">${prayer.name}</label>
+                            <input type="number" id="${prayer.id}Target" class="target-input" 
+                                   min="0" value="${prayer.target}" placeholder="عدد الصلوات المطلوبة">
+                        </div>
+                    `).join('')}
+                    <button type="submit" class="target-btn">
+                        <i class="fas fa-save"></i> تحديث الأعداد المطلوبة
+                    </button>
+                </form>
+            `;
+            targetSection.innerHTML = formHTML;
+        }
+
+        function updateTargets(e) {
+            e.preventDefault();
+            let hasError = false;
+            
+            prayers.forEach(prayer => {
+                const input = document.getElementById(`${prayer.id}Target`);
+                if (input) {
+                    const value = parseInt(input.value);
+                    if (isNaN(value) || value < 0) {
+                        showAlert('خطأ في الإدخال', `عدد صلاة ${prayer.name} يجب أن يكون رقماً موجباً`, 'warning');
+                        hasError = true;
+                        input.focus();
+                        return;
+                    }
+                    prayer.target = value || 0;
+                    if (prayer.count > prayer.target) {
+                        prayer.count = prayer.target;
+                    }
+                }
+            });
+            if (!hasError) {
+                savePrayersData();
+                renderPrayerCards();
+                updateStats();
+                showAlert('تم التحديث', 'تم تحديث أعداد الصلوات المطلوبة بنجاح', 'success');
+            }
+        }
+
+        function renderPrayerCards() {
+            const container = document.getElementById('prayersSection');
+            container.innerHTML = '';
+            
+            prayers.forEach(prayer => {
+                const lastRecord = prayer.records.length > 0 ? prayer.records[prayer.records.length - 1] : null;
+                const lastRecordText = lastRecord ? 
+                    `آخر قضاء: ${formatDate(lastRecord.date)} الساعة ${lastRecord.time}` : 
+                    'لم تقم بقضاء هذه الصلاة بعد';
+                
+                const progressPercent = prayer.target > 0 ? Math.min((prayer.count / prayer.target) * 100, 100) : 0;
+                const isDisabled = prayer.target > 0 && prayer.count >= prayer.target;
+                
+                const card = document.createElement('div');
+                card.className = 'prayer-card';
+                card.innerHTML = `
+                    <div class="prayer-name">${prayer.name}</div>
+                    <div class="prayer-icon"><i class="${prayer.icon}"></i></div>
+                    <div class="prayer-count">${prayer.count} / ${prayer.target}</div>
+                    <div class="prayer-target">صلاة</div>
+                    <div class="prayer-progress-container">
+                        <div class="prayer-progress-bar" style="width: ${progressPercent}%"></div>
+                    </div>
+                    <div class="prayer-date">${lastRecordText}</div>
+                    <button class="btn" onclick="addPrayer('${prayer.id}')" ${isDisabled ? 'disabled' : ''}>
+                        <i class="fas fa-check-circle"></i> ${isDisabled ? 'تم إكمال المطلوب' : 'سجل صلاة قضاء'}
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function addPrayer(prayerId) {
+            const prayer = prayers.find(p => p.id === prayerId);
+            if (!prayer) return;
+            
+            if (prayer.target > 0 && prayer.count >= prayer.target) {
+                showAlert('تم الإكمال', `لقد أكملت قضاء ${prayer.name} المطلوبة`, 'info');
+                return;
+            }
+            
+            const now = new Date();
+            const date = now.toISOString().split('T')[0];
+            const time = now.toTimeString().split(' ')[0].substring(0, 5);
+            prayer.count++;
+            prayer.records.unshift({ date, time });
+            
+            savePrayersData();
+            renderPrayerCards();
+            updateStats();
+            renderRecords();
+            
+            if (prayer.target > 0 && prayer.count >= prayer.target) {
+                showAlert('مبروك!', `لقد أكملت قضاء ${prayer.name} المطلوبة`, 'success');
+            } else {
+                showAlert('تم التسجيل بنجاح', `تم تسجيل قضاء ${prayer.name} بنجاح`, 'success');
+            }
+        }
+
+        function updateStats() {
+            const statsSection = document.getElementById('statsSection');
+            const totalCount = prayers.reduce((sum, prayer) => sum + prayer.count, 0);
+            const totalTarget = prayers.reduce((sum, prayer) => sum + prayer.target, 0);
+            const remaining = totalTarget - totalCount;
+            statsSection.innerHTML = `
+                <div class="stats-card">
+                    <h2><i class="fas fa-calendar-check"></i> إجمالي صلوات القضاء</h2>
+                    <div class="total-prayers" id="totalPrayers">${totalCount}</div>
+                    <p>عدد الصلوات التي قضيتها</p>
+                </div>
+                <div class="stats-card">
+                    <h2><i class="fas fa-clock"></i> الصلوات المتبقية</h2>
+                    <div class="remaining-prayers" id="remainingPrayers">${Math.max(remaining, 0)}</div>
+                    <p>عدد الصلوات التي لم تقضها بعد</p>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progressBar" style="width: ${totalTarget > 0 ? Math.min((totalCount / totalTarget) * 100, 100) : 0}%"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function setupControls() {
+            const controlsSection = document.getElementById('controlsSection');
+            controlsSection.innerHTML = `
+                <button class="control-btn" id="resetAllBtn" onclick="resetAllPrayers()">
+                    <i class="fas fa-redo"></i> إعادة تعيين جميع الصلوات
+                </button>
+                <button class="control-btn" id="clearRecordsBtn" onclick="clearAllRecords()">
+                    <i class="fas fa-trash-alt"></i> حذف جميع السجلات
+                </button>
+                <button class="control-btn" id="addSampleBtn" onclick="addSampleData()">
+                    <i class="fas fa-plus-circle"></i> إضافة بيانات تجريبية
+                </button>
+                <button class="control-btn" id="resetTargetsBtn" onclick="resetTargets()">
+                    <i class="fas fa-bullseye"></i> إعادة تعيين الأهداف
+                </button>
+                <button class="control-btn" id="backToCalculatorBtn" onclick="backToCalculator()">
+                    <i class="fas fa-calculator"></i> إعادة الحساب
+                </button>
+            `;
+        }
+
+        function backToCalculator() {
+            currentStep = 1;
+            calculationMethod = null;
+            calculationDetails = {};
+            selectedPrayers = [];
+            calculationResults = {};
+            updateProgressBar(1);
+            document.querySelectorAll('.calculator-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.getElementById('step1').classList.add('active');
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.getElementById('step1NextBtn').disabled = true;
+            document.getElementById('step2NextBtn').disabled = true;
+            setupPrayerSelection();
+            showCalculator();
+        }
+
+        function setupRecordsFilter() {
+            const recordsSection = document.getElementById('recordsSection');
+            let recordsHTML = `
+                <h2><i class="fas fa-history"></i> سجل صلوات القضاء</h2>
+                <div class="filter-section">
+                    <h3><i class="fas fa-filter"></i> تصفية السجلات</h3>
+                    <form class="filter-form" id="filterForm">
+                        <div class="filter-group">
+                            <label for="filterPrayer">تصفية حسب الصلاة</label>
+                            <select id="filterPrayer" class="filter-select">
+                                <option value="all">جميع الصلوات</option>
+                                ${prayers.map(prayer => `
+                                    <option value="${prayer.id}">${prayer.name}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterFromDate">من تاريخ</label>
+                            <input type="date" id="filterFromDate" class="filter-date">
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterToDate">إلى تاريخ</label>
+                            <input type="date" id="filterToDate" class="filter-date">
+                        </div>
+                        <div class="filter-buttons">
+                            <button type="button" class="filter-btn" onclick="applyRecordsFilter()">
+                                <i class="fas fa-search"></i> تطبيق التصفية
+                            </button>
+                            <button type="button" class="filter-btn clear" onclick="clearRecordsFilter()">
+                                <i class="fas fa-times"></i> مسح التصفية
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="records-list" id="recordsList"></div>
+            `;
+            recordsSection.innerHTML = recordsHTML;
+            setupFilterDates();
+            renderRecords();
+        }
+
+        function setupFilterDates() {
+            const today = new Date();
+            const lastMonth = new Date();
+            lastMonth.setMonth(today.getMonth() - 1);
+            const formatDateForInput = (date) => {
+                return date.toISOString().split('T')[0];
+            };
+            const filterFromDate = document.getElementById('filterFromDate');
+            const filterToDate = document.getElementById('filterToDate');
+            if (filterFromDate) { filterFromDate.value = formatDateForInput(lastMonth); }
+            if (filterToDate) { filterToDate.value = formatDateForInput(today); }
+        }
+
+        function applyRecordsFilter() {
+            renderRecords();
+            showAlert('تم التصفية', 'تم تطبيق عوامل التصفية على السجلات', 'info');
+        }
+
+        function clearRecordsFilter() {
+            document.getElementById('filterPrayer').value = 'all';
+            document.getElementById('filterFromDate').value = '';
+            document.getElementById('filterToDate').value = '';
+            setupFilterDates();
+            renderRecords();
+            showAlert('تم المسح', 'تم مسح جميع عوامل التصفية', 'info');
+        }
+
+        function renderRecords() {
+            const container = document.getElementById('recordsList');
+            if (!container) return;
+            
+            const prayerFilter = document.getElementById('filterPrayer')?.value || 'all';
+            const fromDate = document.getElementById('filterFromDate')?.value;
+            const toDate = document.getElementById('filterToDate')?.value;
+            
+            let allRecords = [];
+            prayers.forEach(prayer => {
+                if (prayerFilter !== 'all' && prayer.id !== prayerFilter) { return; }
+                prayer.records.forEach(record => {
+                    const recordDate = new Date(record.date);
+                    let includeRecord = true;
+                    if (fromDate) {
+                        const from = new Date(fromDate);
+                        if (recordDate < from) { includeRecord = false; }
+                    }
+                    if (toDate) {
+                        const to = new Date(toDate);
+                        to.setDate(to.getDate() + 1);
+                        if (recordDate >= to) { includeRecord = false; }
+                    }
+                    if (includeRecord) {
+                        allRecords.push({
+                            prayerName: prayer.name,
+                            date: record.date,
+                            time: record.time,
+                            timestamp: new Date(`${record.date}T${record.time}`).getTime()
+                        });
+                    }
+                });
+            });
+            allRecords.sort((a, b) => b.timestamp - a.timestamp);
+            
+            if (allRecords.length === 0) {
+                let message = 'لا توجد سجلات حتى الآن. ابدأ بقضاء الصلوات!';
+                if (prayerFilter !== 'all' || fromDate || toDate) {
+                    message = 'لا توجد سجلات تطابق عوامل التصفية المحددة.';
+                }
+                container.innerHTML = `<div class="no-records">${message}</div>`;
+                return;
+            }
+            
+            let recordsHTML = `
+                <div class="record-item" style="background-color: #f8f9fa; font-weight: bold; justify-content: center;">
+                    عرض ${allRecords.length} سجلاً
+                </div>
+            `;
+            allRecords.forEach(record => {
+                recordsHTML += `
+                    <div class="record-item">
+                        <div class="record-prayer">${record.prayerName}</div>
+                        <div class="record-date">${formatDate(record.date)} - ${record.time}</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = recordsHTML;
+        }
+
+        function addSampleData() {
+            if (confirm('هل تريد إضافة بيانات تجريبية؟ سيتم استبدال البيانات الحالية.')) {
+                const sampleData = {
+                    fajr: { count: 3, target: 10, records: [
+                        { date: '2023-10-05', time: '06:15' },
+                        { date: '2023-10-12', time: '06:20' },
+                        { date: '2023-10-19', time: '06:10' }
+                    ]},
+                    dhuhr: { count: 2, target: 8, records: [
+                        { date: '2023-10-08', time: '13:30' },
+                        { date: '2023-10-15', time: '13:45' }
+                    ]},
+                    asr: { count: 1, target: 5, records: [
+                        { date: '2023-10-10', time: '16:20' }
+                    ]},
+                    maghrib: { count: 0, target: 7, records: [] },
+                    isha: { count: 4, target: 12, records: [
+                        { date: '2023-10-03', time: '20:05' },
+                        { date: '2023-10-07', time: '20:10' },
+                        { date: '2023-10-14', time: '20:00' },
+                        { date: '2023-10-21', time: '20:15' }
+                    ]}
+                };
+                
+                prayers.forEach(prayer => {
+                    const sample = sampleData[prayer.id];
+                    if (sample) {
+                        prayer.count = sample.count;
+                        prayer.target = sample.target;
+                        prayer.records = [...sample.records];
+                    }
+                });
+                savePrayersData();
+                updateAllSections();
+                showAlert('تمت الإضافة', 'تم إضافة البيانات التجريبية بنجاح', 'success');
+            }
+        }
+
+        function resetAllPrayers() {
+            if (confirm('هل أنت متأكد من إعادة تعيين جميع الصلوات؟ سيتم حذف جميع البيانات.')) {
+                prayers.forEach(prayer => {
+                    prayer.count = 0;
+                    prayer.records = [];
+                });
+                savePrayersData();
+                updateAllSections();
+                showAlert('تم التعيين', 'تم إعادة تعيين جميع الصلوات بنجاح', 'success');
+            }
+        }
+
+        function resetTargets() {
+            if (confirm('هل تريد إعادة تعيين جميع الأهداف (الصلوات المطلوبة)؟')) {
+                prayers.forEach(prayer => {
+                    prayer.target = 0;
+                });
+                savePrayersData();
+                updateAllSections();
+                showAlert('تم التعيين', 'تم إعادة تعيين جميع الأهداف بنجاح', 'success');
+            }
+        }
+
+        function clearAllRecords() {
+            if (confirm('هل تريد حذف جميع سجلات التواريخ مع الاحتفاظ بعدد الصلوات؟')) {
+                prayers.forEach(prayer => {
+                    prayer.records = [];
+                });
+                savePrayersData();
+                updateAllSections();
+                showAlert('تم الحذف', 'تم حذف جميع السجلات بنجاح', 'success');
+            }
+        }
+
+        function showAlert(title, text, type) {
+            const alert = document.getElementById('alertMessage');
+            document.getElementById('alertTitle').textContent = title;
+            document.getElementById('alertText').textContent = text;
+            alert.className = `alert ${type}`;
+            alert.classList.add('show');
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 3000);
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'غير محدد';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ar-EG', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+    </script>
+</body>
+</html>
