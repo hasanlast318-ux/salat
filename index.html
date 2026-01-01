@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>تطبيق صلاة القضاء - قضاء ما فات من الصلوات</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,152 +19,515 @@
             --border-radius: 15px;
             --transition: all 0.3s ease;
         }
+        html {
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
         body {
             font-family: 'Amiri', serif;
             background-color: #f5f5f5;
             color: #333;
             line-height: 1.6;
             background-image: linear-gradient(to bottom, rgba(245, 245, 245, 0.9), rgba(245, 245, 245, 0.9)), url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtMy4zMTMgMC02IDIuNjg3LTYgNnMyLjY4NyA2IDYgNiA2LTIuNjg3IDYtNi0yLjY4Ny02LTYtNnoiIGZpbGw9IiMxYTVmMjMiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvZz48L3N2Zz4=');
+            min-height: 100vh;
+            overflow-x: hidden;
         }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 15px; 
+            width: 100%;
+        }
         header {
-            text-align: center; padding: 30px 20px; background-color: var(--primary-color);
-            color: white; border-radius: var(--border-radius); margin-bottom: 30px;
-            box-shadow: var(--shadow); position: relative; overflow: hidden;
+            text-align: center; 
+            padding: 20px 15px; 
+            background-color: var(--primary-color);
+            color: white; 
+            border-radius: var(--border-radius); 
+            margin-bottom: 20px;
+            box-shadow: var(--shadow); 
+            position: relative; 
+            overflow: hidden;
+            width: 100%;
         }
         header::before {
-            content: "\f00c"; font-family: "Font Awesome 6 Free"; font-weight: 900;
-            position: absolute; font-size: 150px; opacity: 0.1; right: 20px; top: 10px;
+            content: "\f00c"; 
+            font-family: "Font Awesome 6 Free"; 
+            font-weight: 900;
+            position: absolute; 
+            font-size: 120px; 
+            opacity: 0.1; 
+            right: 10px; 
+            top: 10px;
         }
-        header h1 { font-family: 'Scheherazade New', serif; font-size: 2.8rem; margin-bottom: 10px; position: relative; z-index: 1; }
-        header p { font-size: 1.3rem; max-width: 800px; margin: 0 auto; position: relative; z-index: 1; opacity: 0.9; }
-        .calculator-section { background-color: white; border-radius: var(--border-radius); padding: 25px; box-shadow: var(--shadow); margin-bottom: 30px; }
-        .calculator-section h2 { color: var(--primary-color); margin-bottom: 20px; font-size: 2rem; text-align: center; border-bottom: 2px solid var(--secondary-color); padding-bottom: 10px; }
-        .calculator-steps { display: none; }
+        header h1 { 
+            font-family: 'Scheherazade New', serif; 
+            font-size: 2rem; 
+            margin-bottom: 10px; 
+            position: relative; 
+            z-index: 1; 
+            line-height: 1.3;
+            word-break: break-word;
+        }
+        header p { 
+            font-size: 1.1rem; 
+            max-width: 100%; 
+            margin: 0 auto; 
+            position: relative; 
+            z-index: 1; 
+            opacity: 0.9; 
+            padding: 0 5px;
+        }
+        .calculator-section { 
+            background-color: white; 
+            border-radius: var(--border-radius); 
+            padding: 20px 15px; 
+            box-shadow: var(--shadow); 
+            margin-bottom: 20px; 
+            width: 100%;
+        }
+        .calculator-section h2 { 
+            color: var(--primary-color); 
+            margin-bottom: 15px; 
+            font-size: 1.5rem; 
+            text-align: center; 
+            border-bottom: 2px solid var(--secondary-color); 
+            padding-bottom: 8px; 
+            line-height: 1.3;
+        }
         .calculator-step { display: none; }
         .calculator-step.active { display: block; animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .step-header { font-size: 1.5rem; color: var(--dark-color); margin-bottom: 20px; text-align: center; }
-        .step-description { font-size: 1.2rem; color: #666; margin-bottom: 25px; text-align: center; }
-        .options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .option-card { padding: 20px; border: 2px solid #ddd; border-radius: 10px; cursor: pointer; transition: var(--transition); text-align: center; }
+        .step-header { font-size: 1.3rem; color: var(--dark-color); margin-bottom: 15px; text-align: center; line-height: 1.3; }
+        .step-description { font-size: 1rem; color: #666; margin-bottom: 20px; text-align: center; line-height: 1.4; }
+        .options-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+            gap: 10px; 
+            margin-bottom: 20px; 
+        }
+        .option-card { 
+            padding: 15px; 
+            border: 2px solid #ddd; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            text-align: center; 
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
         .option-card:hover { border-color: var(--primary-color); background-color: rgba(26, 95, 35, 0.05); transform: translateY(-3px); }
         .option-card.selected { border-color: var(--primary-color); background-color: rgba(26, 95, 35, 0.1); }
-        .option-icon { font-size: 2.5rem; color: var(--secondary-color); margin-bottom: 10px; }
-        .option-title { font-size: 1.3rem; color: var(--dark-color); margin-bottom: 5px; }
-        .option-desc { font-size: 1rem; color: #666; }
-        .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; font-size: 1.2rem; margin-bottom: 10px; color: var(--dark-color); font-weight: bold; }
-        .input-control { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 1.2rem; font-family: 'Amiri', serif; transition: var(--transition); }
+        .option-icon { font-size: 2rem; color: var(--secondary-color); margin-bottom: 8px; }
+        .option-title { font-size: 1.1rem; color: var(--dark-color); margin-bottom: 5px; font-weight: bold; }
+        .option-desc { font-size: 0.85rem; color: #666; line-height: 1.3; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 1.1rem; margin-bottom: 8px; color: var(--dark-color); font-weight: bold; }
+        .input-control { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #ddd; 
+            border-radius: 10px; 
+            font-size: 1rem; 
+            font-family: 'Amiri', serif; 
+            transition: var(--transition); 
+        }
         .input-control:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(26, 95, 35, 0.2); }
-        .date-range { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .prayer-selection { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .prayer-option { padding: 15px; border: 2px solid #ddd; border-radius: 10px; cursor: pointer; transition: var(--transition); text-align: center; }
+        .date-range { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .prayer-selection { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 15px; }
+        .prayer-option { 
+            padding: 12px; 
+            border: 2px solid #ddd; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            text-align: center; 
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
         .prayer-option:hover { border-color: var(--primary-color); background-color: rgba(26, 95, 35, 0.05); }
         .prayer-option.selected { border-color: var(--primary-color); background-color: rgba(26, 95, 35, 0.1); }
         .prayer-option.all-selected { border-color: var(--primary-color); background-color: rgba(26, 95, 35, 0.15); }
-        .prayer-name { font-size: 1.3rem; color: var(--dark-color); }
-        .calculator-buttons { display: flex; justify-content: space-between; margin-top: 30px; }
-        .calc-btn { background-color: var(--secondary-color); color: var(--dark-color); border: none; padding: 15px 30px; border-radius: 10px; font-size: 1.2rem; cursor: pointer; transition: var(--transition); font-family: 'Amiri', serif; display: flex; align-items: center; gap: 10px; }
-        .calc-btn:hover { background-color: #c19b2e; transform: scale(1.05); }
+        .prayer-name { font-size: 1.1rem; color: var(--dark-color); line-height: 1.3; }
+        .calculator-buttons { display: flex; justify-content: space-between; margin-top: 20px; gap: 10px; }
+        .calc-btn { 
+            background-color: var(--secondary-color); 
+            color: var(--dark-color); 
+            border: none; 
+            padding: 12px 20px; 
+            border-radius: 10px; 
+            font-size: 1rem; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            font-family: 'Amiri', serif; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            flex: 1;
+            justify-content: center;
+            min-height: 50px;
+        }
         .calc-btn.next { background-color: var(--primary-color); color: white; }
         .calc-btn.next:hover { background-color: #13421b; }
         .calc-btn:disabled { background-color: #95a5a6; cursor: not-allowed; transform: none; }
-        .results-section { background-color: white; border-radius: var(--border-radius); padding: 25px; box-shadow: var(--shadow); margin-bottom: 30px; display: none; }
-        .results-section h2 { color: var(--primary-color); margin-bottom: 20px; font-size: 2rem; text-align: center; border-bottom: 2px solid var(--secondary-color); padding-bottom: 10px; }
-        .results-summary { background-color: #f8f9fa; border-radius: 10px; padding: 20px; margin-bottom: 25px; text-align: center; }
-        .total-prayers-needed { font-size: 3rem; font-weight: bold; color: var(--primary-color); margin: 10px 0; }
-        .result-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-        .result-item { background-color: #f8f9fa; border-radius: 10px; padding: 15px; text-align: center; }
-        .result-prayer { font-size: 1.3rem; color: var(--primary-color); margin-bottom: 10px; }
-        .result-count { font-size: 2rem; font-weight: bold; color: var(--dark-color); }
-        .apply-results-btn { background-color: var(--primary-color); color: white; border: none; padding: 15px 30px; border-radius: 10px; font-size: 1.3rem; cursor: pointer; transition: var(--transition); font-family: 'Amiri', serif; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; margin-top: 20px; }
+        .results-section, .target-section, .stats-section, .prayers-section, .records-section { 
+            background-color: white; 
+            border-radius: var(--border-radius); 
+            padding: 20px 15px; 
+            box-shadow: var(--shadow); 
+            margin-bottom: 20px; 
+            display: none;
+            width: 100%;
+        }
+        .results-section h2, .target-section h2, .stats-section h2, .prayers-section h2, .records-section h2 { 
+            color: var(--primary-color); 
+            margin-bottom: 15px; 
+            font-size: 1.5rem; 
+            text-align: center; 
+            border-bottom: 2px solid var(--secondary-color); 
+            padding-bottom: 8px; 
+        }
+        .results-summary { background-color: #f8f9fa; border-radius: 10px; padding: 15px; margin-bottom: 20px; text-align: center; }
+        .total-prayers-needed { font-size: 2.2rem; font-weight: bold; color: var(--primary-color); margin: 8px 0; line-height: 1.2; }
+        .result-details { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+        .result-item { background-color: #f8f9fa; border-radius: 10px; padding: 12px; text-align: center; }
+        .result-prayer { font-size: 1.1rem; color: var(--primary-color); margin-bottom: 8px; }
+        .result-count { font-size: 1.5rem; font-weight: bold; color: var(--dark-color); }
+        .apply-results-btn { 
+            background-color: var(--primary-color); 
+            color: white; 
+            border: none; 
+            padding: 12px 20px; 
+            border-radius: 10px; 
+            font-size: 1.1rem; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            font-family: 'Amiri', serif; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+            width: 100%; 
+            margin-top: 15px; 
+            min-height: 50px;
+        }
         .apply-results-btn:hover { background-color: #13421b; transform: scale(1.02); }
-        .target-section { background-color: white; border-radius: var(--border-radius); padding: 25px; box-shadow: var(--shadow); margin-bottom: 30px; display: none; }
-        .target-section h2 { color: var(--primary-color); margin-bottom: 20px; font-size: 2rem; text-align: center; border-bottom: 2px solid var(--secondary-color); padding-bottom: 10px; }
-        .target-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .target-form { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
         .target-input-group { display: flex; flex-direction: column; }
-        .target-input-group label { font-size: 1.2rem; margin-bottom: 8px; color: var(--dark-color); font-weight: bold; }
-        .target-input { padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 1.3rem; text-align: center; font-family: 'Amiri', serif; transition: var(--transition); }
+        .target-input-group label { font-size: 1.1rem; margin-bottom: 6px; color: var(--dark-color); font-weight: bold; }
+        .target-input { padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 1.1rem; text-align: center; font-family: 'Amiri', serif; transition: var(--transition); }
         .target-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(26, 95, 35, 0.2); }
-        .target-btn { grid-column: 1 / -1; background-color: var(--secondary-color); color: var(--dark-color); border: none; padding: 15px 30px; border-radius: 10px; font-size: 1.3rem; cursor: pointer; transition: var(--transition); font-family: 'Amiri', serif; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .target-btn { 
+            grid-column: 1 / -1; 
+            background-color: var(--secondary-color); 
+            color: var(--dark-color); 
+            border: none; 
+            padding: 12px 20px; 
+            border-radius: 10px; 
+            font-size: 1.1rem; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            font-family: 'Amiri', serif; 
+            font-weight: bold; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+            min-height: 50px;
+        }
         .target-btn:hover { background-color: #c19b2e; transform: scale(1.02); }
-        .stats-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px; display: none; }
-        .stats-card { background-color: white; border-radius: var(--border-radius); padding: 25px; box-shadow: var(--shadow); text-align: center; border-top: 5px solid var(--secondary-color); }
-        .stats-card h2 { color: var(--primary-color); margin-bottom: 15px; font-size: 1.8rem; }
-        .total-prayers { font-size: 3.5rem; font-weight: bold; color: var(--primary-color); margin: 15px 0; }
-        .remaining-prayers { font-size: 3.5rem; font-weight: bold; color: #e74c3c; margin: 15px 0; }
-        .progress-container { background-color: #ecf0f1; border-radius: 10px; height: 20px; margin: 20px 0; overflow: hidden; }
+        .stats-section { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+        .stats-card { background-color: white; border-radius: var(--border-radius); padding: 20px; box-shadow: var(--shadow); text-align: center; border-top: 5px solid var(--secondary-color); }
+        .stats-card h2 { color: var(--primary-color); margin-bottom: 12px; font-size: 1.4rem; }
+        .total-prayers, .remaining-prayers { font-size: 2.5rem; font-weight: bold; margin: 10px 0; line-height: 1.2; }
+        .total-prayers { color: var(--primary-color); }
+        .remaining-prayers { color: #e74c3c; }
+        .progress-container { background-color: #ecf0f1; border-radius: 10px; height: 16px; margin: 15px 0; overflow: hidden; }
         .progress-bar { height: 100%; background-color: var(--primary-color); border-radius: 10px; transition: var(--transition); }
-        .prayers-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-bottom: 40px; display: none; }
-        .prayer-card { background-color: white; border-radius: var(--border-radius); padding: 25px; box-shadow: var(--shadow); text-align: center; transition: var(--transition); position: relative; overflow: hidden; }
+        .prayers-section { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+        .prayer-card { 
+            background-color: white; 
+            border-radius: var(--border-radius); 
+            padding: 20px; 
+            box-shadow: var(--shadow); 
+            text-align: center; 
+            transition: var(--transition); 
+            position: relative; 
+            overflow: hidden; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 280px;
+        }
         .prayer-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); }
-        .prayer-name { font-size: 2.2rem; color: var(--primary-color); margin-bottom: 15px; font-family: 'Scheherazade New', serif; }
-        .prayer-icon { font-size: 3rem; color: var(--secondary-color); margin-bottom: 20px; }
-        .prayer-count { font-size: 2rem; font-weight: bold; margin: 10px 0; color: var(--dark-color); }
-        .prayer-target { font-size: 1.5rem; color: #7f8c8d; margin-bottom: 15px; }
-        .prayer-progress-container { background-color: #ecf0f1; border-radius: 10px; height: 12px; margin: 15px 0; overflow: hidden; }
+        .prayer-name { font-size: 1.6rem; color: var(--primary-color); margin-bottom: 12px; font-family: 'Scheherazade New', serif; line-height: 1.3; }
+        .prayer-icon { font-size: 2.2rem; color: var(--secondary-color); margin-bottom: 15px; }
+        .prayer-count { font-size: 1.6rem; font-weight: bold; margin: 8px 0; color: var(--dark-color); }
+        .prayer-target { font-size: 1.2rem; color: #7f8c8d; margin-bottom: 12px; }
+        .prayer-progress-container { background-color: #ecf0f1; border-radius: 10px; height: 10px; margin: 12px 0; overflow: hidden; }
         .prayer-progress-bar { height: 100%; background-color: var(--primary-color); border-radius: 10px; transition: var(--transition); }
-        .prayer-date { font-size: 1.1rem; color: #7f8c8d; margin-top: 15px; min-height: 40px; }
-        .btn { background-color: var(--primary-color); color: white; border: none; padding: 15px 30px; border-radius: 50px; font-size: 1.3rem; cursor: pointer; transition: var(--transition); font-family: 'Amiri', serif; margin-top: 15px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .prayer-date { font-size: 0.95rem; color: #7f8c8d; margin-top: 12px; min-height: 35px; line-height: 1.3; }
+        .btn { 
+            background-color: var(--primary-color); 
+            color: white; 
+            border: none; 
+            padding: 12px 20px; 
+            border-radius: 50px; 
+            font-size: 1.1rem; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            font-family: 'Amiri', serif; 
+            margin-top: 12px; 
+            width: 100%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+            min-height: 45px;
+        }
         .btn:hover { background-color: #13421b; transform: scale(1.05); }
-        .btn i { font-size: 1.5rem; }
+        .btn i { font-size: 1.2rem; }
         .btn:disabled { background-color: #95a5a6; cursor: not-allowed; transform: none; }
-        .records-section { background-color: white; border-radius: var(--border-radius); padding: 25px; box-shadow: var(--shadow); margin-bottom: 40px; display: none; }
-        .records-section h2 { color: var(--primary-color); margin-bottom: 20px; font-size: 2rem; text-align: center; border-bottom: 2px solid var(--secondary-color); padding-bottom: 10px; }
-        .filter-section { background-color: #f8f9fa; border-radius: 10px; padding: 20px; margin-bottom: 20px; border: 1px solid #e9ecef; }
-        .filter-section h3 { color: var(--primary-color); margin-bottom: 15px; font-size: 1.5rem; text-align: center; }
-        .filter-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .filter-section { background-color: #f8f9fa; border-radius: 10px; padding: 15px; margin-bottom: 15px; border: 1px solid #e9ecef; }
+        .filter-section h3 { color: var(--primary-color); margin-bottom: 12px; font-size: 1.3rem; text-align: center; }
+        .filter-form { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
         .filter-group { display: flex; flex-direction: column; }
-        .filter-group label { font-size: 1.1rem; margin-bottom: 8px; color: var(--dark-color); font-weight: bold; }
-        .filter-select, .filter-date { padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 1.1rem; font-family: 'Amiri', serif; transition: var(--transition); }
+        .filter-group label { font-size: 1rem; margin-bottom: 6px; color: var(--dark-color); font-weight: bold; }
+        .filter-select, .filter-date { padding: 10px; border: 2px solid #ddd; border-radius: 10px; font-size: 1rem; font-family: 'Amiri', serif; transition: var(--transition); }
         .filter-select:focus, .filter-date:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(26, 95, 35, 0.2); }
-        .filter-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
-        .filter-btn { background-color: var(--secondary-color); color: var(--dark-color); border: none; padding: 12px 20px; border-radius: 10px; font-size: 1.1rem; cursor: pointer; transition: var(--transition); font-family: 'Amiri', serif; display: flex; align-items: center; gap: 8px; }
+        .filter-buttons { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+        .filter-btn { 
+            background-color: var(--secondary-color); 
+            color: var(--dark-color); 
+            border: none; 
+            padding: 10px 16px; 
+            border-radius: 10px; 
+            font-size: 1rem; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            font-family: 'Amiri', serif; 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            flex: 1;
+            justify-content: center;
+        }
         .filter-btn:hover { background-color: #c19b2e; }
         .filter-btn.clear { background-color: #e74c3c; color: white; }
         .filter-btn.clear:hover { background-color: #c0392b; }
-        .records-list { max-height: 400px; overflow-y: auto; }
-        .record-item { padding: 15px; border-bottom: 1px solid #ecf0f1; display: flex; justify-content: space-between; align-items: center; }
-        .record-item:last-child { border-bottom: none; }
-        .record-prayer { font-weight: bold; color: var(--primary-color); font-size: 1.3rem; }
-        .record-date { color: #7f8c8d; }
-        .no-records { text-align: center; padding: 30px; color: #7f8c8d; font-size: 1.2rem; }
-        .controls { display: flex; justify-content: center; gap: 20px; margin-bottom: 40px; flex-wrap: wrap; display: none; }
-        .control-btn { background-color: var(--secondary-color); color: var(--dark-color); border: none; padding: 15px 30px; border-radius: 50px; font-size: 1.2rem; cursor: pointer; transition: var(--transition); font-family: 'Amiri', serif; display: flex; align-items: center; gap: 10px; }
-        .control-btn:hover { background-color: #c19b2e; transform: scale(1.05); }
-        footer { text-align: center; padding: 25px; background-color: var(--dark-color); color: white; border-radius: var(--border-radius); margin-top: 30px; box-shadow: var(--shadow); }
-        .motivation { font-size: 1.4rem; font-style: italic; margin-bottom: 15px; color: var(--light-color); }
-        .hadith { font-size: 1.2rem; opacity: 0.9; max-width: 800px; margin: 0 auto; }
-        @media (max-width: 768px) {
-            header h1 { font-size: 2.2rem; }
-            .prayers-section { grid-template-columns: 1fr; }
-            .stats-section { grid-template-columns: 1fr; }
-            .controls { flex-direction: column; }
-            .control-btn, .btn, .target-btn, .filter-btn, .calc-btn, .apply-results-btn { width: 100%; }
-            .target-form, .filter-form { grid-template-columns: 1fr; }
-            .options-grid { grid-template-columns: 1fr; }
-            .date-range { grid-template-columns: 1fr; }
-            .calculator-buttons { flex-direction: column; gap: 10px; }
-            .prayer-selection { grid-template-columns: 1fr; }
+        .records-list { max-height: 300px; overflow-y: auto; }
+        .record-item { 
+            padding: 12px; 
+            border-bottom: 1px solid #ecf0f1; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-wrap: wrap;
         }
-        .alert { position: fixed; top: 20px; right: 20px; left: 20px; max-width: 500px; margin: 0 auto; padding: 20px; background-color: white; border-radius: var(--border-radius); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); z-index: 1000; text-align: center; transform: translateY(-100px); opacity: 0; transition: all 0.5s ease; }
+        .record-item:last-child { border-bottom: none; }
+        .record-prayer { font-weight: bold; color: var(--primary-color); font-size: 1.1rem; margin-bottom: 4px; }
+        .record-date { color: #7f8c8d; font-size: 0.9rem; }
+        .no-records { text-align: center; padding: 25px; color: #7f8c8d; font-size: 1.1rem; }
+        .controls { 
+            display: flex; 
+            justify-content: center; 
+            gap: 10px; 
+            margin-bottom: 20px; 
+            flex-wrap: wrap; 
+            display: none; 
+            width: 100%;
+        }
+        .control-btn { 
+            background-color: var(--secondary-color); 
+            color: var(--dark-color); 
+            border: none; 
+            padding: 12px 20px; 
+            border-radius: 50px; 
+            font-size: 1rem; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            font-family: 'Amiri', serif; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            flex: 1;
+            min-width: 160px;
+            justify-content: center;
+            min-height: 45px;
+        }
+        .control-btn:hover { background-color: #c19b2e; transform: scale(1.05); }
+        footer { 
+            text-align: center; 
+            padding: 20px 15px; 
+            background-color: var(--dark-color); 
+            color: white; 
+            border-radius: var(--border-radius); 
+            margin-top: 20px; 
+            box-shadow: var(--shadow); 
+            width: 100%;
+        }
+        .motivation { font-size: 1.2rem; font-style: italic; margin-bottom: 12px; color: var(--light-color); line-height: 1.4; }
+        .hadith { font-size: 1rem; opacity: 0.9; max-width: 100%; margin: 0 auto; line-height: 1.4; }
+        .alert { 
+            position: fixed; 
+            top: 15px; 
+            right: 15px; 
+            left: 15px; 
+            max-width: 400px; 
+            margin: 0 auto; 
+            padding: 15px; 
+            background-color: white; 
+            border-radius: var(--border-radius); 
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); 
+            z-index: 1000; 
+            text-align: center; 
+            transform: translateY(-100px); 
+            opacity: 0; 
+            transition: all 0.5s ease; 
+        }
         .alert.show { transform: translateY(0); opacity: 1; }
         .alert.success { border-top: 5px solid #2ecc71; }
         .alert.info { border-top: 5px solid #3498db; }
         .alert.warning { border-top: 5px solid #f39c12; }
-        .alert h3 { color: var(--primary-color); margin-bottom: 10px; }
-        ::-webkit-scrollbar { width: 10px; }
+        .alert h3 { color: var(--primary-color); margin-bottom: 8px; font-size: 1.2rem; }
+        ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #13421b; }
-        .steps-progress { display: flex; justify-content: space-between; margin-bottom: 30px; position: relative; }
-        .steps-progress::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 4px; background-color: #ddd; transform: translateY(-50%); z-index: 1; }
-        .step-progress-bar { position: absolute; top: 50%; left: 0; height: 4px; background-color: var(--primary-color); transform: translateY(-50%); z-index: 2; transition: var(--transition); }
-        .step-point { width: 40px; height: 40px; border-radius: 50%; background-color: white; border: 4px solid #ddd; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #666; position: relative; z-index: 3; transition: var(--transition); }
+        .steps-progress { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 20px; 
+            position: relative; 
+            padding: 0 5px;
+        }
+        .steps-progress::before { 
+            content: ''; 
+            position: absolute; 
+            top: 50%; 
+            left: 10px; 
+            right: 10px; 
+            height: 3px; 
+            background-color: #ddd; 
+            transform: translateY(-50%); 
+            z-index: 1; 
+        }
+        .step-progress-bar { 
+            position: absolute; 
+            top: 50%; 
+            left: 10px; 
+            height: 3px; 
+            background-color: var(--primary-color); 
+            transform: translateY(-50%); 
+            z-index: 2; 
+            transition: var(--transition); 
+        }
+        .step-point { 
+            width: 35px; 
+            height: 35px; 
+            border-radius: 50%; 
+            background-color: white; 
+            border: 3px solid #ddd; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: bold; 
+            color: #666; 
+            position: relative; 
+            z-index: 3; 
+            transition: var(--transition); 
+            font-size: 0.9rem;
+        }
         .step-point.active { border-color: var(--primary-color); color: var(--primary-color); background-color: white; }
         .step-point.completed { border-color: var(--primary-color); background-color: var(--primary-color); color: white; }
-        .step-label { position: absolute; top: 45px; width: 100px; text-align: center; font-size: 0.9rem; color: #666; }
+        .step-label { 
+            position: absolute; 
+            top: 40px; 
+            width: 80px; 
+            text-align: center; 
+            font-size: 0.75rem; 
+            color: #666; 
+            line-height: 1.2;
+        }
+        
+        /* تحسينات خاصة للهواتف ذات الشاشات الصغيرة جدًا */
+        @media (max-width: 480px) {
+            .container { padding: 10px; }
+            header { padding: 15px 10px; }
+            header h1 { font-size: 1.6rem; }
+            header p { font-size: 1rem; }
+            .calculator-section { padding: 15px 10px; }
+            .calculator-section h2 { font-size: 1.3rem; }
+            .step-header { font-size: 1.2rem; }
+            .step-description { font-size: 0.95rem; }
+            .options-grid { grid-template-columns: 1fr; }
+            .option-card { min-height: 120px; }
+            .prayer-selection { grid-template-columns: 1fr; }
+            .target-form, .filter-form { grid-template-columns: 1fr; }
+            .result-details { grid-template-columns: repeat(2, 1fr); }
+            .prayers-section { grid-template-columns: 1fr; }
+            .stats-section { grid-template-columns: 1fr; }
+            .control-btn { min-width: 100%; }
+            .step-point { width: 30px; height: 30px; font-size: 0.8rem; }
+            .step-label { width: 70px; font-size: 0.7rem; top: 35px; }
+            .motivation { font-size: 1.1rem; }
+            .hadith { font-size: 0.95rem; }
+            .record-item { flex-direction: column; align-items: flex-start; }
+            .record-date { margin-top: 5px; }
+        }
+        
+        /* تحسينات للهواتف المتوسطة */
+        @media (min-width: 481px) and (max-width: 767px) {
+            .options-grid { grid-template-columns: repeat(2, 1fr); }
+            .prayer-selection { grid-template-columns: repeat(2, 1fr); }
+            .result-details { grid-template-columns: repeat(3, 1fr); }
+            .prayers-section { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        /* تحسينات للهواتف الكبيرة والأجهزة اللوحية */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .container { padding: 20px; }
+            header h1 { font-size: 2.2rem; }
+            .prayers-section { grid-template-columns: repeat(2, 1fr); }
+            .stats-section { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        /* تحسينات لشاشات اللمس */
+        @media (hover: none) and (pointer: coarse) {
+            .option-card:hover, 
+            .calc-btn:hover, 
+            .btn:hover, 
+            .control-btn:hover,
+            .filter-btn:hover,
+            .target-btn:hover,
+            .apply-results-btn:hover,
+            .prayer-card:hover {
+                transform: none;
+            }
+            .option-card:active, 
+            .calc-btn:active, 
+            .btn:active, 
+            .control-btn:active,
+            .filter-btn:active,
+            .target-btn:active,
+            .apply-results-btn:active {
+                transform: scale(0.98);
+            }
+            .prayer-option { min-height: 80px; }
+            .btn, .calc-btn, .control-btn, .filter-btn, .target-btn, .apply-results-btn {
+                padding: 14px 20px;
+            }
+        }
+        
+        /* منع التكبير التلقائي على حقول الإدخال في iOS */
+        input, select, textarea {
+            font-size: 16px !important;
+        }
     </style>
 </head>
 <body>
